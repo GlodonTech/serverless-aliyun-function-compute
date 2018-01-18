@@ -28,10 +28,15 @@ module.exports = {
   },
 
   setupExecRole() {
-    const role = this.templates.create.Resources[this.provider.getExecRoleLogicalId()].Properties;
-    return BbPromise.bind(this)
+    const arn = this.templates.create.Resources[this.provider.getExecRoleLogicalId()].Arn;
+    if (!arn) {
+      const role = this.templates.create.Resources[this.provider.getExecRoleLogicalId()].Properties;
+      return BbPromise.bind(this)
       .then(() => this.setupRole(role))
       .then((execRole) => this.execRole = execRole);
+    } else {
+      this.execRole.Arn = arn;
+    }
   },
 
   createLogConfigIfNotExists() {
