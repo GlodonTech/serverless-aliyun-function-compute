@@ -86,16 +86,7 @@ module.exports = {
     const functions = this.serverless.service.functions;
     _.forEach(functions, (funcObject, funcKey) => {
 
-      if (!funcObject.events || funcObject.events.length === 0) {
-        const errorMessage = [
-          `Missing "events" property for function "${funcKey}".`,
-          ' Your function needs at least one "event".',
-          ' Please check the docs for more info.',
-        ].join('');
-        throw new Error(errorMessage);
-      }
-
-      if (funcObject.events.length > 1) {
+      if (funcObject.events && funcObject.events.length > 1) {
         const errorMessage = [
           `The function "${funcKey}" has more than one event.`,
           ' Only one event per function is supported.',
