@@ -624,11 +624,11 @@ class AliyunProvider {
     const service = this.getServiceName();
     const roleName = this.getExecRoleName();
 
-    const role = this.service.service.provider.role;
+    const role = this.serverless.service.provider.role;
     if (role) {
       return {
         'Type': 'ALIYUN::RAM::Role',
-        'ARN': `${role}`
+        'Arn': `${role}`
       }
     } else {
       return {
@@ -663,11 +663,11 @@ class AliyunProvider {
   }
 
   letExecRoleAccessLog(resource) {
-    const role = this.service.service.provider.role;
+    const role = this.serverless.service.provider.role;
     if (role) {
       return;
     }
-    
+
     this.addRamRoleStatementsToExecRole(resource, this.getLogWritePolicyStatment());
   }
 

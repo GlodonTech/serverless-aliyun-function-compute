@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const BbPromise = require('bluebird');
+const _ = require('lodash');
 
 module.exports = {
   setupService() {
@@ -35,7 +36,12 @@ module.exports = {
       .then(() => this.setupRole(role))
       .then((execRole) => this.execRole = execRole);
     } else {
-      this.execRole.Arn = arn;
+      //this.execRole.Arn = arn;
+      // _.merge(this.execRole, { ['Arn']: arn});
+      this.execRole = {
+        "Arn": arn
+      };
+      this.serverless.cli.log('exec role is' + JSON.stringify(this.execRole));
     }
   },
 

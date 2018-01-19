@@ -36,7 +36,7 @@ module.exports = {
     // resource: exec role
     const execRoleId = this.provider.getExecRoleLogicalId();
     const execResource = this.provider.getExecRoleResource();
-    if (execResource.ARN) {
+    if (execResource.Arn) {
         this.provider.letExecRoleAccessLog(execResource);
         const ramRoleStatements = this.serverless.service.provider.ramRoleStatements;
         if (Array.isArray(ramRoleStatements)) {
