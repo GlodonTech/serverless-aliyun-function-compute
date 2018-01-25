@@ -353,6 +353,7 @@ class AliyunProvider {
     const timeout = funcObject.timeout
       || service.provider.timeout
       || 30;
+    const runtime = service.provider.runtime;
 
     // TODO(joyeecheung): description
     return {
@@ -363,7 +364,7 @@ class AliyunProvider {
         'handler': funcObject.handler,
         'memorySize': memorySize,
         'timeout': timeout,
-        'runtime': 'nodejs6',
+        'runtime': runtime,
         'code': {
           'ossBucketName': this.getDeploymentBucketName(),
           'ossObjectName': service.package.artifactFilePath

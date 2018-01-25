@@ -12,4 +12,12 @@ module.exports = {
 
     return BbPromise.resolve();
   },
+
+  getJavaRuntime() {
+  	return 'java8';
+  },
+
+  getNodeJSRuntime() {
+  	return 'nodejs6';
+  }
 };

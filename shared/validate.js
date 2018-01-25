@@ -2,6 +2,7 @@
 
 const BbPromise = require('bluebird');
 const _ = require('lodash');
+const Utils = require('./utils');
 
 module.exports = {
   validate() {
@@ -46,6 +47,18 @@ module.exports = {
     return BbPromise.resolve();
   },
 
+  validateProviderRuntime() {
+    const providerName = this.serverless.service.provider.name;
+    const runtime = this.serverless.service.provider.runtime;
+    if (runtime !== Utils.getJavaRuntime() && runtime !== Utils.getNodeJSRuntime()) {
+      const errorMessage = [
+          `The "runtime" property for your provider "${providerName}" not supported.`,
+          ' Only support java8 and nodejs6 now.',
+        ].join('');
+        throw new Error(errorMessage);
+    }
+  },
+
   validateHandlers() {
     const functions = this.serverless.service.functions;
     _.forEach(functions, (funcObject, funcKey) => {
@@ -69,14 +82,28 @@ module.exports = {
         ].join('');
         throw new Error(errorMessage);
       }
-
-      if (!/^[^.]+\.[^.]+$/.test(funcObject.handler)) {
-        const errorMessage = [
-          `The "handler" property for the function "${funcKey}" is invalid.`,
-          ' Handlers should be specified like ${fileName}.${funcName}',
-          ' Please check the docs for more info.',
-        ].join('');
-        throw new Error(errorMessage);
+      // validate handler according to runtime
+      const runtime = this.serverless.service.provider.runtime;
+      switch (runtime) {
+        case Utils.getJavaRuntime():
+          if (!/^(\w+\.)*\w+::\w+$/.test(funcObject.handler)) {
+            const errorMessage = [
+            `The "handler" property for the function "${funcKey}" is invalid.`,
+            ' Handlers should be specified like ${packageName}.${className}::${funcName}',
+            ' Please check the docs for more info.'
+            ].join('');
+            throw new Error(errorMessage);
+          }
+          break;
+        default:
+          if (!/^[^.]+\.[^.]+$/.test(funcObject.handler)) {
+            const errorMessage = [
+            `The "handler" property for the function "${funcKey}" is invalid.`,
+            ' Handlers should be specified like ${fileName}.${funcName}',
+            ' Please check the docs for more info.',
+            ].join('');
+            throw new Error(errorMessage);
+          }
       }
     });
     return BbPromise.resolve();
