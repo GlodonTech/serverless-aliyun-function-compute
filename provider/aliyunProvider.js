@@ -264,6 +264,7 @@ class AliyunProvider {
   getArtifactDirectoryPrefix() {
     const service = this.serverless.service.service;
     const stage = this.options.stage;
+
     return `serverless/${service}/${stage}`;
   }
 
@@ -536,14 +537,19 @@ class AliyunProvider {
     };
   }
 
-  getObjectResource(objectName, localPath) {
+  getObjectsResource() {
     return {
       'Type': 'ALIYUN::OSS:Object',
       'Properties': {
-        'BucketName': this.getDeploymentBucketName(),
-        'ObjectName': objectName,
-        'LocalPath': localPath
+        'BucketName': this.getDeploymentBucketName()
       }
+    };
+  }
+
+  getObjectResource(objectName, localPath) {
+    return {
+      'ObjectName': objectName,
+      'LocalPath': localPath
     };
   }
 
