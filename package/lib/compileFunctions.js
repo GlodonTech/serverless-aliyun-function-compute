@@ -48,16 +48,11 @@ module.exports = {
     const filePath = path.join(packagePath, fileName);
     const objectsResource = this.provider.getObjectsResource(artifactFilePath, filePath);
     const resProperties = objectsResource.Properties;
-    // TODO: need to see if package.individually is true
-    if (funcName === undefined) {
+    if (this.serverless.service.package.individually !== true || funcName === undefined) {
       funcName = this.provider.getServiceName();
     }
-    if (!resProperties.Objects) {
-      resProperties["Objects"] = {
-        [funcName] : this.provider.getObjectResource(artifactFilePath, filePath)
-      }
-    } else {
-      _.merge(resProperties.Objects, { [funcName]: this.provider.getObjectResource(artifactFilePath, filePath) });
+    resProperties["Objects"] = {
+      [funcName]: this.provider.getObjectResource(artifactFilePath, filePath)
     }
     _.merge(resources, { [objectId]: objectsResource });
   },
