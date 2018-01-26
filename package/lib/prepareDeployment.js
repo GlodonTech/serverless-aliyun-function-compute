@@ -36,13 +36,15 @@ module.exports = {
     // resource: exec role
     const execRoleId = this.provider.getExecRoleLogicalId();
     const execResource = this.provider.getExecRoleResource();
-    this.provider.letExecRoleAccessLog(execResource);
-    const ramRoleStatements = this.serverless.service.provider.ramRoleStatements;
-    if (Array.isArray(ramRoleStatements)) {
-      ramRoleStatements.forEach((stmt) => {
-        // TODO: validation
-        this.provider.addRamRoleStatementsToExecRole(execResource, stmt);
-      });
+    if (execResource.Arn) {
+        this.provider.letExecRoleAccessLog(execResource);
+        const ramRoleStatements = this.serverless.service.provider.ramRoleStatements;
+        if (Array.isArray(ramRoleStatements)) {
+            ramRoleStatements.forEach((stmt) => {
+            // TODO: validation
+            this.provider.addRamRoleStatementsToExecRole(execResource, stmt);
+            });
+        }
     }
     resources[execRoleId] = execResource;
 

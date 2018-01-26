@@ -24,12 +24,15 @@ module.exports = {
   },
 
   setupInvokeRole() {
-    const role = this.templates.update.Resources[this.provider.getInvokeRoleLogicalId()].Properties;
+    // if have no api gateway or triggers, not set up invoke role
+    if (this.apis.length || this.triggers.length) {
+      const role = this.templates.update.Resources[this.provider.getInvokeRoleLogicalId()].Properties;
 
     // TODO: update if needed
-    return BbPromise.bind(this)
-      .then(() => this.setupRole(role))
-      .then((invokeRole) => this.invokeRole = invokeRole);
+      return BbPromise.bind(this)
+        .then(() => this.setupRole(role))
+        .then((invokeRole) => this.invokeRole = invokeRole);
+    }
   },
 
   createApisIfNeeded() {

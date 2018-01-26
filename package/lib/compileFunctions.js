@@ -10,10 +10,13 @@ const BbPromise = require('bluebird');
 module.exports = {
   compileFunctions() {
     this.resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
-    this.compileStorage(this.serverless.service.package.artifact);
+    const artifact = this.serverless.service.package.artifact;
+    if (artifact) {
+      this.compileStorage(artifact);
+    }
     this.serverless.service.getAllFunctions().forEach((functionName) => {
       const funcObject = this.serverless.service.getFunction(functionName);
-      this.compileFunctionAndEvent(functionName, funcObject);
+      this.compileFunction(functionName, funcObject);
     });
     return BbPromise.resolve();
   },
@@ -21,12 +24,14 @@ module.exports = {
   compileFunction(funcName, funcObject) {
     this.resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
     // Notice artifact is different
-    this.compileStorage(funcObject.package.artifact);
+    if (funcObject.package.artifact) {
+      this.compileStorage(funcObject.package.artifact, funcName);
+    }
     this.compileFunctionAndEvent(funcName, funcObject);
     return BbPromise.resolve();
   },
 
-  compileStorage(artifact) {
+  compileStorage(artifact, funcName) {
     const objectId = this.provider.getStorageObjectId();
     const resources = this.resources;
 
@@ -41,10 +46,15 @@ module.exports = {
     const packagePath = 
       path.join(this.serverless.config.servicePath || '.', '.serverless');
     const filePath = path.join(packagePath, fileName);
-
-    const objectResource = this.provider.getObjectResource(artifactFilePath, filePath);
-
-    _.merge(resources, { [objectId]: objectResource });
+    const objectsResource = this.provider.getObjectsResource(artifactFilePath, filePath);
+    const resProperties = objectsResource.Properties;
+    if (this.serverless.service.package.individually !== true || funcName === undefined) {
+      funcName = this.provider.getServiceName();
+    }
+    resProperties["Objects"] = {
+      [funcName]: this.provider.getObjectResource(artifactFilePath, filePath)
+    }
+    _.merge(resources, { [objectId]: objectsResource });
   },
 
   compileFunctionAndEvent(functionName, funcObject) {
